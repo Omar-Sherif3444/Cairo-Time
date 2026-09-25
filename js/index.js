@@ -1,7 +1,7 @@
-let timers = document.querySelectorAll("h1");
-let zone = document.querySelector(".zone");
+const timers = document.querySelectorAll("h1");
+const zone = document.querySelector(".zone");
 function updateClock() {
-  let dt = new Date();
+  const dt = new Date();
 
   timers.forEach((timer) => {
     const met = timer.dataset.method;
@@ -23,21 +23,14 @@ function formatTime(format, value, timer) {
 }
 
 function twelveHours(value, timer) {
-  if (value > 12) {
-    value -= 12;
-  } else if (value == 0) {
-    value = 12;
-  }
+  if (value > 12) value -= 12;
+  if (value === 0) value = 12;
 
   timer.innerHTML = value;
 }
 
 function pmORam(value) {
-  if (value >= 12) {
-    zone.innerHTML = "PM";
-  } else {
-    zone.innerHTML = "AM";
-  }
+  zone.innerHTML = value >= 12 ? "PM" : "AM";
 }
 
 function padding(value, timer) {
