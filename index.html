@@ -3,25 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/css/bootstrap.css" />
-    <link rel="stylesheet" href="/css/index.css" />
-    <title>Timer</title>
+    <meta name="theme-color" content="#0b0f1a" />
+    <title>Cairo Clock</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;500&family=Inter:wght@400;500;600&family=Noto+Kufi+Arabic:wght@400;500&display=swap"
+    />
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="css/index.css" />
   </head>
   <body>
-    <div class="d-flex justify-content-center align-items-center vh-100">
-      <h1 data-method="getHours" data-format="hours">00</h1>
-
-      <span>:</span>
-
-      <h1 data-method="getMinutes" data-format="padding">00</h1>
-
-      <span>:</span>
-
-      <h1 data-method="getSeconds" data-format="padding">00</h1>
-
-      <span class="zone"></span>
+    <div class="backdrop" aria-hidden="true">
+      <div class="orb orb--sun"></div>
+      <div class="orb orb--nile"></div>
+      <div class="stars"></div>
+      <svg class="skyline" viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice">
+        <path class="dune dune--back" d="M0 210 Q360 170 720 200 T1440 190 V260 H0Z" />
+        <path class="pyramid pyramid--far" d="M930 205 L1030 118 L1130 205Z" />
+        <path class="pyramid pyramid--mid" d="M1040 210 L1185 80 L1330 210Z" />
+        <path class="pyramid-shade" d="M1185 80 L1330 210 L1225 210Z" />
+        <path class="pyramid pyramid--near" d="M1250 222 L1330 150 L1410 222Z" />
+        <path class="minaret" d="M170 210 V120 h6 V100 l6 -12 l6 12 V120 h6 V210Z" />
+        <path class="dome" d="M210 210 V170 a34 34 0 0 1 68 0 V210Z" />
+        <path class="minaret" d="M296 210 V135 h5 V118 l5 -10 l5 10 V135 h5 V210Z" />
+        <path class="dune dune--front" d="M0 232 Q420 200 840 228 T1440 222 V260 H0Z" />
+      </svg>
     </div>
-    <script src="/js/bootstrap.bundle.js"></script>
-    <script src="/js/index.js"></script>
+
+    <main class="stage">
+      <section class="card" aria-label="Current time in Cairo">
+        <header class="card__head">
+          <span class="live"><i class="live__dot"></i>Live</span>
+          <div class="city">
+            <p class="city__name">Cairo</p>
+            <p class="city__ar" lang="ar" dir="rtl">القاهرة</p>
+          </div>
+          <span class="tz">Africa/Cairo</span>
+        </header>
+
+        <div class="clock" role="timer" aria-live="off">
+          <h1 class="digit digit--h" data-method="getHours" data-format="hours">00</h1>
+
+          <span class="sep" aria-hidden="true">:</span>
+
+          <h1 class="digit digit--m" data-method="getMinutes" data-format="padding">00</h1>
+
+          <span class="sep sep--sm" aria-hidden="true">:</span>
+
+          <h1 class="digit digit--s" data-method="getSeconds" data-format="padding">00</h1>
+
+          <span class="zone"></span>
+        </div>
+
+        <footer class="card__foot">
+          <span class="rule" aria-hidden="true"></span>
+          <p>Egypt &middot; مصر</p>
+          <span class="rule" aria-hidden="true"></span>
+        </footer>
+      </section>
+    </main>
+
+    <script src="js/bootstrap.bundle.js"></script>
+    <script src="js/index.js"></script>
   </body>
 </html>

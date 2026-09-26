@@ -1,9 +1,469 @@
-span {
-  font-size: 50px;
-  padding-bottom: 15px;
+/* ==========================================================
+   Cairo Clock — "Nile at dusk"
+   Deep indigo night, desert-gold accents, pyramids on the horizon.
+   ========================================================== */
+
+:root {
+  --bg-0: #070a13;
+  --bg-1: #0b0f1a;
+  --bg-2: #131a2c;
+
+  --gold: #e9b965;
+  --gold-soft: #f4d9a4;
+  --sand: #c79a5b;
+  --nile: #3aa9b8;
+
+  --ink: #f3efe6;
+  --ink-2: rgba(243, 239, 230, 0.62);
+  --ink-3: rgba(243, 239, 230, 0.38);
+
+  --glass: rgba(20, 26, 44, 0.55);
+  --glass-edge: rgba(233, 185, 101, 0.18);
+
+  --f-display: "Outfit", "Segoe UI", system-ui, sans-serif;
+  --f-ui: "Inter", "Segoe UI", system-ui, sans-serif;
+  --f-ar: "Noto Kufi Arabic", "Segoe UI", "Tahoma", sans-serif;
+
+  --radius: 32px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  font-family: var(--f-ui);
+  color: var(--ink);
+  background:
+    radial-gradient(120% 80% at 50% 110%, #2a1f2e 0%, transparent 60%),
+    linear-gradient(180deg, var(--bg-0) 0%, var(--bg-1) 45%, var(--bg-2) 100%);
+  background-color: var(--bg-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- Backdrop ---------- */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.55;
+}
+
+.orb--sun {
+  width: 46vmax;
+  height: 46vmax;
+  right: -10vmax;
+  bottom: -18vmax;
+  background: radial-gradient(circle, #f0a44b 0%, #b8562f 45%, transparent 70%);
+  opacity: 0.35;
+  animation: drift 18s var(--ease) infinite alternate;
+}
+
+.orb--nile {
+  width: 40vmax;
+  height: 40vmax;
+  left: -14vmax;
+  top: -14vmax;
+  background: radial-gradient(circle, var(--nile) 0%, #1c3f73 50%, transparent 72%);
+  opacity: 0.28;
+  animation: drift 22s var(--ease) infinite alternate-reverse;
+}
+
+.stars {
+  position: absolute;
+  inset: 0 0 35% 0;
+  background-image:
+    radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.7), transparent 60%),
+    radial-gradient(1px 1px at 28% 42%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(1.5px 1.5px at 44% 12%, rgba(255, 255, 255, 0.8), transparent 60%),
+    radial-gradient(1px 1px at 63% 30%, rgba(255, 255, 255, 0.5), transparent 60%),
+    radial-gradient(1px 1px at 78% 8%, rgba(255, 255, 255, 0.65), transparent 60%),
+    radial-gradient(1.5px 1.5px at 88% 38%, rgba(255, 255, 255, 0.55), transparent 60%),
+    radial-gradient(1px 1px at 6% 55%, rgba(255, 255, 255, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 52% 58%, rgba(255, 255, 255, 0.35), transparent 60%),
+    radial-gradient(1px 1px at 94% 64%, rgba(255, 255, 255, 0.4), transparent 60%),
+    radial-gradient(1px 1px at 35% 70%, rgba(255, 255, 255, 0.3), transparent 60%);
+  animation: twinkle 6s ease-in-out infinite alternate;
+}
+
+.skyline {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: clamp(140px, 26vh, 260px);
+}
+
+.dune--back {
+  fill: #1a1726;
+}
+.dune--front {
+  fill: #0d0c16;
+}
+.pyramid--far {
+  fill: #221c2b;
+}
+.pyramid--mid {
+  fill: #2b2230;
+}
+.pyramid-shade {
+  fill: #1a1520;
+}
+.pyramid--near {
+  fill: #1d1824;
+}
+.minaret,
+.dome {
+  fill: #16131f;
+}
+
+/* ---------- Stage & card ---------- */
+
+.stage {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  grid-template-columns: minmax(0, 1fr);
+  padding: clamp(16px, 4vw, 48px);
+  padding-bottom: clamp(96px, 20vh, 200px);
+}
+
+.card {
+  position: relative;
+  width: min(100%, 880px);
+  padding: clamp(24px, 4.5vw, 52px) clamp(20px, 5vw, 64px);
+  border-radius: var(--radius);
+  background: var(--glass);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 40px 80px -30px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(0, 0, 0, 0.25);
+  animation: rise 0.9s var(--ease) both;
+}
+
+/* gold hairline border that fades around the edge */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    140deg,
+    rgba(233, 185, 101, 0.55),
+    rgba(233, 185, 101, 0) 35%,
+    rgba(58, 169, 184, 0) 65%,
+    rgba(58, 169, 184, 0.4)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* ---------- Header ---------- */
+
+.card__head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: clamp(16px, 3vw, 28px);
+}
+
+.city {
+  text-align: center;
+}
+
+.city__name {
+  margin: 0;
+  font-family: var(--f-ui);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: var(--gold);
+  padding-left: 0.42em; /* optically recenters tracked caps */
+}
+
+.city__ar {
+  margin: 4px 0 0;
+  font-family: var(--f-ar);
+  font-size: 1.05rem;
+  color: var(--ink-2);
+}
+
+.live,
+.tz {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.live {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.live__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.6);
+  animation: ping 2s ease-out infinite;
+}
+
+.tz {
+  justify-self: end;
+  font-family: var(--f-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Clock face ---------- */
+
+.clock {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-template-rows: 1fr 1fr;
+  justify-content: center;
+  align-items: center;
+  column-gap: clamp(4px, 1.4vw, 18px);
+  font-family: var(--f-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.clock h1 {
+  margin: 0;
+  font-family: inherit;
+  line-height: 0.9;
+}
+
+.digit--h,
+.digit--m {
+  grid-row: 1 / span 2;
+  font-size: clamp(4.25rem, 17vw, 11rem);
+  font-weight: 200;
+  letter-spacing: -0.04em;
+  background: linear-gradient(180deg, #fffaf0 0%, var(--gold-soft) 55%, var(--sand) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 8px 30px rgba(233, 185, 101, 0.18));
+}
+
+.digit--h {
+  grid-column: 1;
+  min-width: 2ch; /* 9 → 10 won't shift the layout */
+  text-align: right;
+}
+
+.digit--m {
+  grid-column: 3;
+}
+
+.sep {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  font-family: var(--f-display);
+  font-size: clamp(3rem, 12vw, 8rem);
+  font-weight: 200;
+  line-height: 1;
+  color: var(--gold);
+  opacity: 0.85;
+  transform: translateY(-0.06em);
+  animation: blink 2s steps(1, end) infinite;
+}
+
+/* seconds & AM/PM stack to the right of the minutes */
+.sep--sm {
+  display: none;
+}
+
 .zone {
-  font-size: 40px;
-  padding-top: 10px;
-  padding-left: 10px;
+  grid-column: 4;
+  grid-row: 1;
+  align-self: end;
+  justify-self: start;
+  margin-bottom: clamp(6px, 1vw, 12px);
+  padding: 0.35em 0.75em;
+  border-radius: 999px;
+  font-family: var(--f-ui);
+  font-size: clamp(0.7rem, 1.6vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--bg-1);
+  background: linear-gradient(135deg, var(--gold-soft), var(--gold));
+  box-shadow: 0 6px 20px -6px rgba(233, 185, 101, 0.6);
+}
+
+.zone:empty {
+  visibility: hidden;
+}
+
+.digit--s {
+  grid-column: 4;
+  grid-row: 2;
+  align-self: start;
+  justify-self: start;
+  font-size: clamp(1.9rem, 6.5vw, 4rem);
+  font-weight: 300;
+  color: var(--nile);
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 24px rgba(58, 169, 184, 0.35);
+}
+
+/* ---------- Footer ---------- */
+
+.card__foot {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: clamp(18px, 3.5vw, 32px);
+}
+
+.card__foot p {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.rule {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(233, 185, 101, 0.35), transparent);
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.55);
+  }
+  80%,
+  100% {
+    box-shadow: 0 0 0 9px rgba(74, 222, 128, 0);
+  }
+}
+
+@keyframes drift {
+  to {
+    transform: translate3d(-4vmax, -3vmax, 0) scale(1.08);
+  }
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+  }
+}
+
+/* ---------- Small screens ---------- */
+
+@media (max-width: 520px) {
+  .card__head {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "city city"
+      "live tz";
+    row-gap: 14px;
+  }
+  .city {
+    grid-area: city;
+  }
+  .live {
+    grid-area: live;
+  }
+  .tz {
+    grid-area: tz;
+  }
+  .card__foot p {
+    letter-spacing: 0.2em;
+  }
+}
+
+/* Landscape phones: keep it all on one screen */
+@media (max-height: 480px) and (orientation: landscape) {
+  .stage {
+    padding-bottom: clamp(16px, 4vw, 48px);
+  }
+  .skyline {
+    height: 90px;
+  }
+  .digit--h,
+  .digit--m {
+    font-size: clamp(3.5rem, 22vh, 7rem);
+  }
 }
